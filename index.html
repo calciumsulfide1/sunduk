@@ -27,9 +27,6 @@
             position: relative;
             width: 300px;
             height: 240px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             cursor: pointer;
         }
 
@@ -37,13 +34,14 @@
         .photos-container {
             position: absolute;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             pointer-events: none;
-            z-index: 1;
+            z-index: 10;
         }
 
         .photo {
@@ -53,7 +51,7 @@
             object-fit: cover;
             border: 6px solid #fff;
             border-bottom: 22px solid #fff;
-            box-shadow: 0 10px 25px rgba(255,255,255,0.1);
+            box-shadow: 0 10px 25px rgba(255,255,255,0.2);
             border-radius: 4px;
             opacity: 0;
             transform: scale(0.1) translateY(80px);
@@ -63,31 +61,34 @@
         /* Анимация вылета фото при открытии */
         .scene.open .photos-container .photo-1 {
             opacity: 1;
-            transform: scale(1) translateY(-130px) rotate(-12deg) translateX(-80px);
+            transform: scale(1) translateY(-140px) rotate(-12deg) translateX(-80px);
             pointer-events: auto;
         }
 
         .scene.open .photos-container .photo-2 {
             opacity: 1;
-            transform: scale(1) translateY(-130px) rotate(12deg) translateX(80px);
+            transform: scale(1) translateY(-140px) rotate(12deg) translateX(80px);
             transition-delay: 0.2s;
             pointer-events: auto;
         }
 
         .photo:hover {
-            transform: scale(1.15) translateY(-140px) rotate(0deg) !important;
-            z-index: 10;
+            transform: scale(1.15) translateY(-150px) rotate(0deg) !important;
+            z-index: 20;
         }
 
         /* SVG сундук */
         .chest-svg {
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 240px;
             z-index: 2;
         }
 
         .chest-lid {
-            transform-origin: 150px 85px;
+            transform-origin: 150px 90px;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -107,3 +108,179 @@
         .modal-overlay {
             position: fixed;
             top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: #0a0a0a;
+            border: 2px solid #ff0033;
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.5), inset 0 0 15px rgba(255, 0, 51, 0.1);
+            padding: 30px 40px;
+            border-radius: 12px;
+            text-align: center;
+            width: 310px;
+        }
+
+        .modal label {
+            display: block;
+            color: #ff334b;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255, 51, 75, 0.6);
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 12px;
+            background: #141414;
+            border: 2px solid #ff0033;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 8px;
+            outline: none;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .modal input:focus {
+            border-color: #ff3366;
+            box-shadow: 0 0 12px rgba(255, 51, 102, 0.7);
+        }
+
+        .error-msg {
+            color: #ff0033;
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 15px;
+            min-height: 20px;
+            text-shadow: 0 0 8px rgba(255, 0, 51, 0.6);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scene" id="scene">
+        <!-- SVG сундук с фиксированными размерами -->
+        <svg class="chest-svg" viewBox="0 0 300 240" width="300" height="240" xmlns="http://www.w3.org/2000/svg">
+            <!-- Корпус сундука -->
+            <g class="chest-base">
+                <rect x="30" y="90" width="240" height="120" rx="10" fill="#8B4513" stroke="#4A2306" stroke-width="6"/>
+                <!-- Внутренность при открытии -->
+                <rect x="36" y="96" width="228" height="30" fill="#1A0D03"/>
+                <!-- Полосы/ремни -->
+                <rect x="65" y="90" width="26" height="120" fill="#1f1f1f" stroke="#ff0033" stroke-width="2"/>
+                <rect x="209" y="90" width="26" height="120" fill="#1f1f1f" stroke="#ff0033" stroke-width="2"/>
+                <!-- Заклепки -->
+                <circle cx="78" cy="110" r="3.5" fill="#ff0033"/>
+                <circle cx="78" cy="150" r="3.5" fill="#ff0033"/>
+                <circle cx="78" cy="190" r="3.5" fill="#ff0033"/>
+                <circle cx="222" cy="110" r="3.5" fill="#ff0033"/>
+                <circle cx="222" cy="150" r="3.5" fill="#ff0033"/>
+                <circle cx="222" cy="190" r="3.5" fill="#ff0033"/>
+            </g>
+
+            <!-- Крышка сундука -->
+            <g class="chest-lid">
+                <path d="M 30 90 Q 150 20 270 90 Z" fill="#A0522D" stroke="#4A2306" stroke-width="6"/>
+                <rect x="65" y="42" width="26" height="48" fill="#1f1f1f" stroke="#ff0033" stroke-width="2"/>
+                <rect x="209" y="42" width="26" height="48" fill="#1f1f1f" stroke="#ff0033" stroke-width="2"/>
+                <circle cx="78" cy="60" r="3.5" fill="#ff0033"/>
+                <circle cx="222" cy="60" r="3.5" fill="#ff0033"/>
+            </g>
+
+            <!-- Замок -->
+            <g class="chest-lock">
+                <path d="M 140 75 A 10 10 0 0 1 160 75 V 85 H 140 Z" fill="none" stroke="#FFD700" stroke-width="4"/>
+                <rect x="132" y="83" width="36" height="44" rx="6" fill="#FFD700" stroke="#8B6508" stroke-width="3"/>
+                <circle cx="150" cy="100" r="5" fill="#1A0D03"/>
+                <polygon points="147,102 153,102 151,115 149,115" fill="#1A0D03"/>
+            </g>
+        </svg>
+
+        <div class="photos-container">
+            <img src="https://i.postimg.cc/nz2W3PRp/6f66670a-8d95-4b5d-aa83-8229b76c6868.png" alt="Photo 1" class="photo photo-1">
+            <img src="https://i.postimg.cc/J4v2YJqH/68d988a6-fb6f-440b-8334-87dfd17e26ea.png" alt="Photo 2" class="photo photo-2">
+        </div>
+    </div>
+
+    <!-- Модальное окно кода -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modalWindow">
+            <label for="codeInput">введите код:</label>
+            <input type="password" id="codeInput" maxlength="5" autocomplete="off" autofocus>
+            <div class="error-msg" id="errorMsg"></div>
+        </div>
+    </div>
+
+    <script>
+        const scene = document.getElementById('scene');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalWindow = document.getElementById('modalWindow');
+        const codeInput = document.getElementById('codeInput');
+        const errorMsg = document.getElementById('errorMsg');
+
+        let isUnlocked = false;
+
+        scene.addEventListener('click', () => {
+            if (!isUnlocked) {
+                modalOverlay.classList.add('active');
+                codeInput.focus();
+            }
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+                codeInput.value = '';
+                errorMsg.textContent = '';
+            }
+        });
+
+        codeInput.addEventListener('input', () => {
+            errorMsg.textContent = '';
+            const val = codeInput.value;
+
+            if (val === '22095') {
+                isUnlocked = true;
+                modalOverlay.classList.remove('active');
+                scene.classList.add('open');
+            } else if (val.length === 5) {
+                errorMsg.textContent = 'ну ты норм?';
+                modalWindow.classList.add('shake');
+                setTimeout(() => {
+                    modalWindow.classList.remove('shake');
+                }, 400);
+            }
+        });
+    </script>
+</body>
+</html>
